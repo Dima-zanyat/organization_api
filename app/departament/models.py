@@ -26,21 +26,25 @@ class Department(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="departaments",
+        related_name="departments",
     )
     created_at = models.DateField(auto_now_add=True)
 
     class Meta:
         """Meta-класс модели Department."""
 
-        verbose_name = "Депортамент"
-        verbose_name_plural = "Депортаменты"
+        verbose_name = "Департамент"
+        verbose_name_plural = "Департаменты"
+        indexes = [models.Index(fields="parent_id")]
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "parent_id"],
                 name="unique_departament_name_per_parent",
             )
         ]
+
+    def __str__(self):
+        return self.name
 
 
 class Employee(models.Model):
@@ -70,3 +74,6 @@ class Employee(models.Model):
 
         verbose_name = "Сотрудник"
         verbose_name_plural = "Сотрудники"
+
+    def __str__(self):
+        return self.full_name
