@@ -35,7 +35,7 @@ class Department(models.Model):
 
         verbose_name = "Департамент"
         verbose_name_plural = "Департаменты"
-        indexes = [models.Index(fields="parent_id")]
+        indexes = [models.Index(fields=["parent_id"])]
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "parent_id"],
@@ -72,6 +72,7 @@ class Employee(models.Model):
     class Meta:
         """Класс Meta модели Employee."""
 
+        ordering = ["created_at"]
         verbose_name = "Сотрудник"
         verbose_name_plural = "Сотрудники"
 
