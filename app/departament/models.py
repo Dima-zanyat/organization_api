@@ -6,7 +6,7 @@
 
 from django.db import models
 
-from core.constant import MAX_LENGTH_NAME_FEILD
+from core.constant import MAX_LENGTH_NAME_FIELD
 
 
 class Department(models.Model):
@@ -19,27 +19,27 @@ class Department(models.Model):
 
     name = models.CharField(
         verbose_name="Название",
-        max_length=MAX_LENGTH_NAME_FEILD,
+        max_length=MAX_LENGTH_NAME_FIELD,
     )
-    parent_id = models.ForeignKey(
+    parent = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="departments",
+        related_name="children",
     )
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         """Meta-класс модели Department."""
 
         verbose_name = "Департамент"
         verbose_name_plural = "Департаменты"
-        indexes = [models.Index(fields=["parent_id"])]
+        indexes = [models.Index(fields=["parent"])]
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "parent_id"],
-                name="unique_departament_name_per_parent",
+                fields=["name", "parent"],
+                name="unique_department_name_per_parent",
             )
         ]
 
@@ -52,18 +52,18 @@ class Employee(models.Model):
 
     full_name = models.CharField(
         verbose_name="Полное имя",
-        max_length=MAX_LENGTH_NAME_FEILD,
+        max_length=MAX_LENGTH_NAME_FIELD,
     )
     position = models.CharField(
         verbose_name="Позиция",
-        max_length=MAX_LENGTH_NAME_FEILD,
+        max_length=MAX_LENGTH_NAME_FIELD,
     )
     hired_at = models.DateField(
         null=True,
         blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    department_id = models.ForeignKey(
+    department = models.ForeignKey(
         Department,
         on_delete=models.CASCADE,
         related_name="employees",
