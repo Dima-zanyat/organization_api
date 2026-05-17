@@ -5,3 +5,5 @@ DEFAULT_NUMBER_DEPTH: int = 1
 MINIMUM_ALLOWED_DEPTH: int = 0
 RECURSION_NUMBER_DEPTH: int = -1
 MAX_DEPTH: int = 5
+MIN_DEPTH: int = 1
+MODE_DELETES = ("cascade", "reassign")

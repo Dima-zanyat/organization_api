@@ -8,6 +8,7 @@ from core.constant import (
 )
 from api.serializers.base_serializers import BaseDepartamentSerializer
 from api.serializers.employee import EmployeeSerializer
+from api.services.department_tree import validate_department_cycle
 
 
 class DepartmentCreateSerializer(BaseDepartamentSerializer):
@@ -22,22 +23,19 @@ class DepartmentCreateSerializer(BaseDepartamentSerializer):
 
 
 class DepartmentUpdateSerializer(BaseDepartamentSerializer):
+    """
+    Сериализатор для обновления объекта
+
+    В классе происходит обновление родителя если таковой передан
+    и валидация зацикливания в деревере объектов.
+    """
 
     def validate(self, attrs):
         """Проверка на циклическую зависимость."""
-
-        new_parent = attrs.get("parent")
-        department = self.instance
-
-        if not new_parent:
-            return attrs
-
-        current = new_parent
-
-        while current is not None:
-            if current.id == department.id:
-                raise serializers.ValidationError("Нельзя создать цикл в дереве.")
-            current = current.parent
+        validate_department_cycle(
+            department=self.instance,
+            new_parent=attrs.get("parent"),
+        )
         return attrs
 
 

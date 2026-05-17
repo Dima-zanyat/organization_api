@@ -5,13 +5,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from api.services.department_delete import delete_with_cascade, delete_with_reassign
 from api.serializers.departament import (
     DepartmentCreateSerializer,
     DepartmentUpdateSerializer,
     DepartmentDetailSerializer,
     EmployeeSerializer,
 )
-from core.constant import DEFAULT_NUMBER_DEPTH, MAX_DEPTH
+from api.validations import DepartmentDeleteValidator
+
+from core.constant import DEFAULT_NUMBER_DEPTH, MIN_DEPTH, MAX_DEPTH
 from departament.models import Department
 
 
@@ -26,7 +29,7 @@ class DepartmentAPIView(APIView):
         except ValueError:
             depth = DEFAULT_NUMBER_DEPTH
 
-        depth = max(1, min(depth, DEFAULT_NUMBER_DEPTH))
+        depth = max(MIN_DEPTH, min(depth, MAX_DEPTH))
 
         include_employees = (
             request.query_params.get(
@@ -70,6 +73,24 @@ class DepartmentAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    def delete(self, request, pk):
+        """Удаление департамента."""
+        validator = DepartmentDeleteValidator(request, pk)
+        validated_data = validator.validate()
+
+        mode = validated_data["mode"]
+        department = get_object_or_404(Department, id=pk)
+
+        if mode == "reassign":
+            reassign_id = validated_data["reassign_id"]
+            reassign_department = get_object_or_404(Department, id=reassign_id)
+            delete_with_reassign(department, reassign_department)
+
+        elif mode == "cascade":
+            delete_with_cascade(department)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class EmployeeAPIView(APIView):
