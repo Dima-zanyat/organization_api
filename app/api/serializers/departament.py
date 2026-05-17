@@ -45,6 +45,20 @@ class DepartmentDetailSerializer(BaseDepartamentSerializer):
     employees = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
 
+    class Meta(BaseDepartamentSerializer.Meta):
+        """
+        Расширяем класс базовый класс мета
+
+        Добавляем в него поля:
+        -'employees'
+        -'children'
+        """
+
+        fields = BaseDepartamentSerializer.Meta.fields + (
+            "employees",
+            "children",
+        )
+
     def get_employees(self, obj):
         """Возвращает список сотрудников подразделения."""
         include_employees = self.context.get("include_employees")

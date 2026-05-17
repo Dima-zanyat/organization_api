@@ -77,9 +77,10 @@ class DepartmentAPIView(APIView):
     def delete(self, request, pk):
         """Удаление департамента."""
         validator = DepartmentDeleteValidator(request, pk)
-        validated_data = validator.validate()
+        validated_data = validator.get_and_validate_data()
 
         mode = validated_data["mode"]
+        print(mode)
         department = get_object_or_404(Department, id=pk)
 
         if mode == "reassign":

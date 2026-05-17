@@ -1,0 +1,879 @@
+{
+	"info": {
+		"_postman_id": "org-api-collection-001",
+		"name": "Organization API",
+		"description": "Postman коллекция для тестирования API organization_api проекта",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16131548"
+	},
+	"item": [
+		{
+			"name": "Department // Create",
+			"item": [
+				{
+					"name": "create_root_department",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const responseSchema = {",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"id\": {\"type\": \"number\"},",
+									"        \"name\": {\"type\": \"string\"},",
+									"        \"parent\": {\"type\": [\"number\", \"null\"]},",
+									"        \"created_at\": {\"type\": \"string\"}",
+									"    },",
+									"    \"required\": [\"id\", \"name\", \"parent\", \"created_at\"],",
+									"    \"additionalProperties\": false",
+									"};",
+									"",
+									"pm.test('Статус-код ответа должен быть 201', function () {",
+									"    pm.expect(",
+									"        pm.response.code,",
+									"        'Убедитесь, что запрос на создание нового departmenta, содержащий корректные данные, возвращает ответ со статус-кодом 201'",
+									"    ).to.equal(201);",
+									"    const departmentId = _.get(responseData, 'id');",
+									"    if (departmentId) {",
+									"        pm.collectionVariables.set('rootDepartmentId', departmentId);",
+									"    }",
+									"});",
+									"",
+									"pm.test('Структура ответа должна соответствовать ожидаемой', function () {",
+									"    pm.response.to.have.jsonSchema(responseSchema);",
+									"});",
+									"",
+									"pm.test('Поле name должно содержать переданное значение', function () {",
+									"    pm.expect(responseData.name).to.equal(pm.collectionVariables.get('departmentName'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{departmentName}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_child_department",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const responseSchema = {",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"id\": {\"type\": \"number\"},",
+									"        \"name\": {\"type\": \"string\"},",
+									"        \"parent\": {\"type\": \"number\"},",
+									"        \"created_at\": {\"type\": \"string\"}",
+									"    },",
+									"    \"required\": [\"id\", \"name\", \"parent\", \"created_at\"],",
+									"    \"additionalProperties\": false",
+									"};",
+									"",
+									"pm.test('Status code should be 201', function () {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"    const departmentId = _.get(responseData, 'id');",
+									"    if (departmentId) {",
+									"        pm.collectionVariables.set('childDepartmentId', departmentId);",
+									"    }",
+									"});",
+									"",
+									"pm.test('Response structure should match expected schema', function () {",
+									"    pm.response.to.have.jsonSchema(responseSchema);",
+									"});",
+									"",
+									"pm.test('Parent field should contain root department ID', function () {",
+									"    const parentId = pm.collectionVariables.get('rootDepartmentId');",
+									"    pm.expect(responseData.parent).to.equal(Number(parentId));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{childDepartmentName}}\",\n    \"parent\": {{rootDepartmentId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_department_for_cascade",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"pm.test('Status code should be 201', function () {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"    const departmentId = _.get(responseData, 'id');",
+									"    if (departmentId) {",
+									"        pm.collectionVariables.set('cascadeDepartmentId', departmentId);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{cascadeDepartmentName}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_department_for_reassign",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"pm.test('Status code should be 201', function () {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"    const departmentId = _.get(responseData, 'id');",
+									"    if (departmentId) {",
+									"        pm.collectionVariables.set('reassignDepartmentId', departmentId);",
+									"    }",
+									"});",
+									"",
+									"pm.test('Create grandchild for reassign test', function () {",
+									"    const reassignId = pm.collectionVariables.get('reassignDepartmentId');",
+									"    pm.expect(reassignId).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{reassignDepartmentName}}\",\n    \"parent\": {{childDepartmentId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Department // Read",
+			"item": [
+				{
+					"name": "get_root_department",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const responseSchema = {",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"id\": {\"type\": \"number\"},",
+									"        \"name\": {\"type\": \"string\"},",
+									"        \"parent\": {\"type\": [\"number\", \"null\"]},",
+									"        \"created_at\": {\"type\": \"string\"},",
+									"        \"children\": {\"type\": \"array\"},",
+									"        \"employees\": {\"type\": \"array\"}",
+									"    },",
+									"    \"required\": [\"id\", \"name\", \"parent\", \"created_at\", \"children\", \"employees\"],",
+									"    \"additionalProperties\": false",
+									"};",
+									"",
+									"pm.test('Статус-код ответа должен быть 200', function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test('Структура ответа должна соответствовать ожидаемой', function () {",
+									"    pm.response.to.have.jsonSchema(responseSchema);",
+									"});",
+									"",
+									"pm.test('Поле id должно соответствовать запрашиваемому departmentu', function () {",
+									"    const departmentId = pm.collectionVariables.get('rootDepartmentId');",
+									"    pm.expect(responseData.id).to.equal(Number(departmentId));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_department_with_depth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Статус-код ответа должен быть 200', function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test('Поле children должно содержать вложенные departmenty', function () {",
+									"    pm.expect(responseData.children).to.be.an('array');",
+									"    pm.expect(responseData.children.length).to.be.greaterThan(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/?depth=2&include_employees=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								""
+							],
+							"query": [
+								{
+									"key": "depth",
+									"value": "2"
+								},
+								{
+									"key": "include_employees",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_department_without_employees",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Статус-код ответа должен быть 200', function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test('Поле employees должно быть пустым массивом при include_employees=false', function () {",
+									"    pm.expect(responseData.employees).to.be.an('array').that.is.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/?include_employees=false",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								""
+							],
+							"query": [
+								{
+									"key": "include_employees",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Department // Update",
+			"item": [
+				{
+					"name": "update_department_name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Статус-код ответа должен быть 200', function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test('Поле name должно содержать новое значение', function () {",
+									"    pm.expect(responseData.name).to.equal(pm.collectionVariables.get('updatedDepartmentName'));",
+									"});",
+									"",
+									"pm.test('ID departmenta должен остаться без изменений', function () {",
+									"    const departmentId = pm.collectionVariables.get('rootDepartmentId');",
+									"    pm.expect(responseData.id).to.equal(Number(departmentId));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{updatedDepartmentName}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_department_parent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Статус-код ответа должен быть 200', function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test('Поле parent должно содержать новый ID родительского departmenta', function () {",
+									"    const newParentId = pm.collectionVariables.get('childDepartmentId');",
+									"    pm.expect(responseData.parent).to.equal(Number(newParentId));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"parent\": {{childDepartmentId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Department // Delete",
+			"item": [
+				{
+					"name": "delete_department_with_cascade",
+					"event": [
+						{
+							"listen": "pre-request",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('thirdDepartmentName', 'Третий отдел для удаления');",
+									"pm.collectionVariables.set('cascadeDepartmentName', 'Отдел для каскадного удаления');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Статус-код ответа должен быть 204', function () {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mode\": \"cascade\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{cascadeDepartmentId}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{cascadeDepartmentId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_department_with_reassign",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Статус-код ответа должен быть 204', function () {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mode\": \"reassign\",\n    \"reassign_id\": {{rootDepartmentId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{childDepartmentId}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{childDepartmentId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employee // Create",
+			"item": [
+				{
+					"name": "create_employee_in_department",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"const responseSchema = {",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"id\": {\"type\": \"number\"},",
+									"        \"full_name\": {\"type\": \"string\"},",
+									"        \"position\": {\"type\": \"string\"},",
+									"        \"hired_at\": {\"type\": [\"string\", \"null\"]},",
+									"        \"created_at\": {\"type\": \"string\"}",
+									"    },",
+									"    \"required\": [\"id\", \"full_name\", \"position\", \"created_at\"],",
+									"    \"additionalProperties\": false",
+									"};",
+									"",
+									"pm.test('Статус-код ответа должен быть 201', function () {",
+									"    pm.expect(",
+									"        pm.response.code,",
+									"        'Убедитесь, что запрос на создание нового employee, содержащий корректные данные, возвращает ответ со статус-кодом 201'",
+									"    ).to.equal(201);",
+									"    const employeeId = _.get(responseData, 'id');",
+									"    if (employeeId) {",
+									"        pm.collectionVariables.set('employeeId', employeeId);",
+									"    }",
+									"});",
+									"",
+									"pm.test('Структура ответа должна соответствовать ожидаемой', function () {",
+									"    pm.response.to.have.jsonSchema(responseSchema);",
+									"});",
+									"",
+									"pm.test('Поле full_name должно содержать переданное значение', function () {",
+									"    pm.expect(responseData.full_name).to.equal(pm.collectionVariables.get('employeeFullName'));",
+									"});",
+									"",
+									"pm.test('Поле position должно содержать переданное значение', function () {",
+									"    pm.expect(responseData.position).to.equal(pm.collectionVariables.get('employeePosition'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"{{employeeFullName}}\",\n    \"position\": \"{{employeePosition}}\",\n    \"hired_at\": \"2024-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/employees/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								"employees",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_second_employee",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Статус-код ответа должен быть 201', function () {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"    const employeeId = _.get(responseData, 'id');",
+									"    if (employeeId) {",
+									"        pm.collectionVariables.set('employeeId2', employeeId);",
+									"    }",
+									"});",
+									"",
+									"pm.test('Поле full_name должно содержать переданное значение', function () {",
+									"    pm.expect(responseData.full_name).to.equal(pm.collectionVariables.get('employeeFullName2'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"full_name\": \"{{employeeFullName2}}\",\n    \"position\": \"{{employeePosition2}}\",\n    \"hired_at\": \"2024-02-20\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/employees/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								"employees",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employee // Verify in Department",
+			"item": [
+				{
+					"name": "get_department_with_employees",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseData = pm.response.json();",
+									"",
+									"pm.test('Статус-код ответа должен быть 200', function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test('Поле employees должно содержать добавленных employees', function () {",
+									"    pm.expect(responseData.employees).to.be.an('array');",
+									"    pm.expect(responseData.employees.length).to.be.greaterThanOrEqual(2);",
+									"});",
+									"",
+									"pm.test('Первый employee должен иметь корректные данные', function () {",
+									"    const firstEmployee = responseData.employees[0];",
+									"    pm.expect(firstEmployee.full_name).to.equal(pm.collectionVariables.get('employeeFullName'));",
+									"    pm.expect(firstEmployee.position).to.equal(pm.collectionVariables.get('employeePosition'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/departments/{{rootDepartmentId}}/?include_employees=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"departments",
+								"{{rootDepartmentId}}",
+								""
+							],
+							"query": [
+								{
+									"key": "include_employees",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "departmentName",
+			"value": "Отдел разработки",
+			"type": "string"
+		},
+		{
+			"key": "childDepartmentName",
+			"value": "Backend команда",
+			"type": "string"
+		},
+		{
+			"key": "updatedDepartmentName",
+			"value": "Обновлённый отдел разработки",
+			"type": "string"
+		},
+		{
+			"key": "rootDepartmentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "childDepartmentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cascadeDepartmentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "employeeFullName",
+			"value": "Иван Петров",
+			"type": "string"
+		},
+		{
+			"key": "employeePosition",
+			"value": "Senior Backend Developer",
+			"type": "string"
+		},
+		{
+			"key": "employeeFullName2",
+			"value": "Мария Сидорова",
+			"type": "string"
+		},
+		{
+			"key": "employeePosition2",
+			"value": "Junior Frontend Developer",
+			"type": "string"
+		},
+		{
+			"key": "employeeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "employeeId2",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "thirdDepartmentName",
+			"value": "Третий отдел для удаления",
+			"type": "string"
+		},
+		{
+			"key": "cascadeDepartmentName",
+			"value": "Отдел для каскадного удаления",
+			"type": "string"
+		}
+	]
+}
